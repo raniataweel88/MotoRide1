@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MotoRide.Models;
 
@@ -11,9 +12,11 @@ using MotoRide.Models;
 namespace MotoRide.Migrations
 {
     [DbContext(typeof(MotoRideDbContext))]
-    partial class MotoRideDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250407174805_addNewTables")]
+    partial class addNewTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -383,14 +386,8 @@ namespace MotoRide.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int?>("MotorcycleId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
@@ -413,8 +410,6 @@ namespace MotoRide.Migrations
                     b.HasKey("OrderItemId");
 
                     b.HasIndex("MotorcycleId");
-
-                    b.HasIndex("OrderId");
 
                     b.HasIndex("ProductId");
 
@@ -813,19 +808,11 @@ namespace MotoRide.Migrations
                         .WithMany()
                         .HasForeignKey("MotorcycleId");
 
-                    b.HasOne("MotoRide.Models.Order", "Order")
-                        .WithMany()
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("MotoRide.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId");
 
                     b.Navigation("Motorcycle");
-
-                    b.Navigation("Order");
 
                     b.Navigation("Product");
                 });

@@ -20,5 +20,7 @@ namespace MotoRide.Models
 
         public bool? IsActive { get; set; }
         public string? Token { get; internal set; }
+        public List<Booking>? Bookings { get; set; } 
+
     }
 }

@@ -8,7 +8,7 @@ namespace MotoRide.Dto
         public string? Password { get; set; }
         public string? Email { get; set; }
         public string? Phone { get; set; }
-        public string? Iamgelicense { get; set; }
+        public IFormFile? Iamgelicense { get; set; }
         public string? Location { get; set; }
     }
     public class AddCustomerDto

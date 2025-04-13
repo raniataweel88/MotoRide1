@@ -48,13 +48,33 @@ namespace MotoRide.Services
         {
             try
             {
-                var order = await _context.Orders
-                              .Where(x => x.IsActive != true&&x.StatusDelivery==true&&x.StoreId == shopId)
-                              .ToListAsync();
+                var order = await _context.OrderItems
+      .Include(x => x.Order)
+      .Where(x => x.StoreId == shopId
+               && x.Order.IsActive != true
+               && x.Order.StatusDelivery == true)
+      .GroupBy(x => new
+      {
+          x.OrderId,
+          x.Order.Title,
+          x.Order.StatusPayment,
+          x.Order.RecivingDate
+
+      })
+      .Select(group => new
+      {
+          OrderId = group.Key.OrderId,
+          Title = group.Key.Title,
+          TotalPrice = group.Sum(item => item.Price * item.Quantity),
+          StatusPayment = group.Key.StatusPayment,
+          RecivingDate = group.Key.RecivingDate,
+      })
+      .ToListAsync();
+
 
                 if (order == null)
                 {
-                    _response.Message = "can not Get All Order Received By Shop";
+                    _response.Message = "can not Get All Order Not Received By Shop";
                     _response.Success = false;
                 }
                 _response.Data = order;
@@ -63,7 +83,7 @@ namespace MotoRide.Services
             }
             catch (Exception e)
             {
-                _response.Message = "can not Get All Order Received By Shop" + e.Message;
+                _response.Message = "can not Get All Order Not Received By Shop" + e.Message;
                 _response.Success = false;
             }
             return _response;
@@ -72,8 +92,77 @@ namespace MotoRide.Services
         {
             try
             {
-                var order = await _context.Orders
-                              .Where(x => x.IsActive != true && x.StatusDelivery==true && x.StoreId ==shopId)
+                var order= await _context.OrderItems
+      .Include(x => x.Order)
+      .Where(x => x.StoreId == shopId
+               && x.Order.IsActive != true
+               && x.Order.StatusDelivery != true)
+      .GroupBy(x => new
+      {
+          x.OrderId,
+          x.Order.Title,
+          x.Order.StatusPayment,
+          x.Order.RecivingDate
+
+      })
+      .Select(group => new
+      {
+          OrderId = group.Key.OrderId,
+          Title = group.Key.Title,
+          TotalPrice = group.Sum(item => item.Price * item.Quantity),
+          StatusPayment=  group.Key.StatusPayment,
+          RecivingDate = group.Key.RecivingDate,
+      })
+      .ToListAsync();
+
+
+                if (order == null)
+                {
+                    _response.Message = "can not Get All Order Not Received By Shop";
+                    _response.Success = false;
+                }
+                _response.Data = order;
+                _response.Success = true;
+
+            }
+            catch (Exception e)
+            {
+                _response.Message = "can not Get All Order Not Received By Shop" + e.Message;
+                _response.Success = false;
+            }
+            return _response;
+        }
+        public async Task<ServiceResponse> GetItemOrderReceivedByShop(int shopId, int orderId)
+        {
+            try
+            {
+                var order = await _context.OrderItems
+                                .Where(x => x.StoreId == shopId && x.OrderId == orderId && x.Order.IsActive != true && x.Order.StatusDelivery == true)
+                              .ToListAsync();
+
+                if (order == null)
+                {
+                    _response.Message = "can not Get All item in Order  Received By Shop";
+                    _response.Success = false;
+                }
+                _response.Data = order;
+                _response.Success = true;
+
+            }
+            catch (Exception e)
+            {
+                _response.Message = "can not All item in Order  Received By Shop" + e.Message;
+                _response.Success = false;
+            }
+            return _response;
+        }
+
+        public async Task<ServiceResponse> GetItemOrderNotReceivedByShop(int shopId, int orderId)
+        {
+            try
+            {
+                var order = await _context.OrderItems
+                                .Where(x => x.StoreId == shopId && x.OrderId == orderId && x.Order.IsActive != true && x.Order.StatusDelivery != true)
                               .ToListAsync();
 
                 if (order == null)
@@ -92,6 +181,7 @@ namespace MotoRide.Services
             }
             return _response;
         }
+
         public async Task<ServiceResponse> GetOrder(int orderId)
         {
             try
@@ -222,7 +312,9 @@ namespace MotoRide.Services
                         MotorcycleId = item.MotorcycleId,
                         Size = item.Size,
                         OrderId=o.OrderId,
+                        Name = product?.Name ?? motorcycle?.Name ?? "",
                         Quantity = (int)item.Quantity,
+                        Image= product?.Images ?? motorcycle?.Images ?? "",
                         ProductId = item.ProductId,
                         Price = product?.Price ?? motorcycle?.Price ?? 0, // إذا كان أحدهما غير متوفر، استخدم الآخر
                         StoreId = product?.StoreId ?? motorcycle?.StoreId ?? 0,

@@ -52,8 +52,11 @@ namespace MotoRide.Services
                     _response.Message = $"can not get  cart to this customer {cutomerId}";
                     _response.Success = false;
                 }
+                else {
                 _response.Data = cart.CartId;
                 _response.Success = true;
+
+            }             
                 return _response;
             }
             catch (Exception e)

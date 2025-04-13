@@ -15,11 +15,13 @@ namespace MotoRide.Controllers
         private readonly ICatrgoiresServices _categoryServices;
         private readonly IAuthenticationServices _authenticationServices;
         private readonly IReviewServices _reviewServices;
-        public AdmainController(ICatrgoiresServices categoryServices,IAuthenticationServices authenticationServices, IReviewServices reviewServices)
+        private readonly IStoreServices _storeServices; 
+        public AdmainController(ICatrgoiresServices categoryServices,IAuthenticationServices authenticationServices, IReviewServices reviewServices,IStoreServices store)
         {
             _categoryServices = categoryServices;
             _authenticationServices = authenticationServices;
             _reviewServices = reviewServices;
+            _storeServices=store;
         }
         #region Category
    
@@ -75,6 +77,36 @@ namespace MotoRide.Controllers
             return BadRequest(response);
         }
         #endregion
+        #region Store
+        [HttpGet("GetAllStoreAccept")]
+        public async Task<IActionResult> GetAllStoreAccept()
+        {
+            var response = await _storeServices.GetAllStoreAccept();
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
 
+        [HttpGet("GetAllStoreNotResponse")]
+        public async Task<IActionResult> GetAllStoreNotResponse()
+        {
+            var response = await _storeServices.GetAllStoreNotResponse();
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
+        [HttpGet("GetAllStoreReject")]
+        public async Task<IActionResult> GetAllStoreReject()
+        {
+            var response = await _storeServices.GetAllStoreReject();
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
+        [HttpGet("AllowStoreToLogin")]
+        public async Task<IActionResult> AllowStoreToLogin(int id,bool IsCanLogin)
+        {
+            var response = await _storeServices.AllowStoreToLogin(id,IsCanLogin);
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
+        #endregion
     }
 }

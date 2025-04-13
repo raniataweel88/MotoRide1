@@ -16,5 +16,8 @@ namespace MotoRide.IServices
         public Task<ServiceResponse> GetOrderByIdForthisShop(int orderId, int shopId);
         public Task<ServiceResponse> GetAllOrderforUser(int customerId);
         public  Task<ServiceResponse> GetOrderDetails(int orderId);
+        public  Task<ServiceResponse> GetItemOrderNotReceivedByShop(int shopId, int orderId);
+        public Task<ServiceResponse> GetItemOrderReceivedByShop(int shopId, int orderId);
+
     }
 }

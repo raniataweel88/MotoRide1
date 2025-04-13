@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MotoRide.Models;
 
@@ -11,9 +12,11 @@ using MotoRide.Models;
 namespace MotoRide.Migrations
 {
     [DbContext(typeof(MotoRideDbContext))]
-    partial class MotoRideDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250408200831_addNameinAddItem")]
+    partial class addNameinAddItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -46,9 +46,19 @@ namespace MotoRide.Controllers
 
         }
         [HttpPost("RegisterOwnerShop")]
-        public async Task<IActionResult> RegisterOwnerShop([FromBody] AddOwnerShopDto dto)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> RegisterOwnerShop([FromForm] AddOwnerShopDto dto)
         {
             var response = await _authservices.RegisterOwnerShop(dto);
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
+        [HttpPost("RegisterMaintenance")]
+        [Consumes("multipart/form-data")]
+
+        public async Task<IActionResult> RegisterMaintenance([FromForm] AddMaintenanceDto dto)
+        {
+            var response = await _authservices.RegisterMaintenance(dto);
             if (response.Success) { return Ok(response); }
             return BadRequest(response);
         }

@@ -103,6 +103,9 @@ namespace MotoRide.Models
         public DbSet<Store> Stores { get; set; }
         public DbSet<WishList> WishLists { get; set; }
         public DbSet<Review> Reviews { get; set; }
-   
+        public DbSet<Booking> Bookings { get; set; }
+        public DbSet<Maintenance> Maintenances { get; set; }
+        public DbSet<Invoice> Invoices { get; set; }
+
     }
 }

@@ -11,6 +11,9 @@ namespace MotoRide.IServices
        public Task<ServiceResponse> RegisterOwnerShop(AddOwnerShopDto dto);
         public Task<ServiceResponse> ResetPassword(string email, string newPassword);
         public Task<ServiceResponse> Logout(int id);
-       
+        public Task<ServiceResponse> GetCustomerProfile(int id);
+        public  Task<ServiceResponse> RegisterMaintenance(AddMaintenanceDto dto);
+
+
     }
 }

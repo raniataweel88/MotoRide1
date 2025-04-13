@@ -69,7 +69,7 @@ namespace MotoRide.Controllers
         #endregion
         #region  Motocyle
         [HttpGet("GetMotocyleByShop/${id}")]
-        public async Task<IActionResult> RegisterOwnerShop(int id)
+        public async Task<IActionResult> GetMotorcycleByShop(int id)
         {
             var response = await _motocyleService.GetMotorcycleByShop(id);
             if (response.Success) { return Ok(response); }
@@ -167,6 +167,20 @@ namespace MotoRide.Controllers
         public async Task<IActionResult> GetOrderByIdForthisShop(int orderId,int shopId)
         {
             var response = await _orderServices.GetOrderByIdForthisShop(orderId, shopId);
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
+        [HttpGet("GetItemOrderNotReceivedByShop/${orderId}/${shopId}")]
+        public async Task<IActionResult> GetItemOrderNotReceivedByShop(int orderId, int shopId)
+        {
+            var response = await _orderServices.GetItemOrderNotReceivedByShop(orderId, shopId);
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
+        [HttpGet("GetItemOrderReceivedByShop/${orderId}/${shopId}")]
+        public async Task<IActionResult> GetItemOrderReceivedByShop(int orderId, int shopId)
+        {
+            var response = await _orderServices.GetItemOrderReceivedByShop(orderId, shopId);
             if (response.Success) { return Ok(response); }
             return BadRequest(response);
         }

@@ -263,6 +263,12 @@ namespace MotoRide.Controllers
             return BadRequest(response);
         }
         #endregion
-
+        [HttpGet("GetCustomerProfile/${id}")]
+        public async Task<IActionResult> GetCustomerProfile(int id)
+        {
+            var response = await _authentication.GetCustomerProfile(id);
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
     }
 }

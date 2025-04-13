@@ -48,7 +48,99 @@ namespace MotoRide.Services
             }
          
         }
+        public async Task<ServiceResponse> GetAllStoreAccept()
+        {
+            try
+            {
+                var shops = from s in await _context.Stores.Where(x => x.IsActive != false&&x.IsCanLogin==true).ToListAsync()
+                            select new
+                            {
+                                s.StoreId,
+                                s.StoreName,
 
+                            };
+                if (shops != null)
+                {
+                    _respon.Data = shops;
+                    _respon.Success = true;
+                }
+                else
+                {
+                    _respon.Message = "can not get any shop";
+                    _respon.Success = false;
+                }
+                return _respon;
+            }
+            catch (Exception ex)
+            {
+                _respon.Message = ex.Message;
+                _respon.Success = false;
+                return _respon;
+            }
+
+        }
+        public async Task<ServiceResponse> GetAllStoreReject()
+        {
+            try
+            {
+                var shops = from s in await _context.Stores.Where(x => x.IsActive != false&&x.IsCanLogin==false).ToListAsync()
+                            select new
+                            {
+                                s.StoreId,
+                                s.StoreName,
+
+                            };
+                if (shops != null)
+                {
+                    _respon.Data = shops;
+                    _respon.Success = true;
+                }
+                else
+                {
+                    _respon.Message = "can not get any shop";
+                    _respon.Success = false;
+                }
+                return _respon;
+            }
+            catch (Exception ex)
+            {
+                _respon.Message = ex.Message;
+                _respon.Success = false;
+                return _respon;
+            }
+
+        }
+        public async Task<ServiceResponse> GetAllStoreNotResponse()
+        {
+            try
+            {
+                var shops = from s in await _context.Stores.Where(x => x.IsActive != false && x.IsCanLogin == null).ToListAsync()
+                            select new
+                            {
+                                s.StoreId,
+                                s.StoreName,
+
+                            };
+                if (shops != null)
+                {
+                    _respon.Data = shops;
+                    _respon.Success = true;
+                }
+                else
+                {
+                    _respon.Message = "can not get any shop";
+                    _respon.Success = false;
+                }
+                return _respon;
+            }
+            catch (Exception ex)
+            {
+                _respon.Message = ex.Message;
+                _respon.Success = false;
+                return _respon;
+            }
+
+        }
         public async Task<ServiceResponse> AllowStoreToLogin(int id,bool IsCanLogin)
         {
             try {

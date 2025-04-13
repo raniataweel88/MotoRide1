@@ -81,7 +81,8 @@ namespace MotoRide.Services
                     };
 
                    var data= await _cart.AddCart(cartDto);
-                    dto.CartId = data.Data.CartId;
+                    var cartCreateNow = await _context.Carts.FirstOrDefaultAsync(x => x.CustomerId == dto.CustomerId && x.IsActive != false);
+                    dto.CartId = cartCreateNow.CartId;
                     await AddCartItem(dto);
                     _response.Message = "done to add new item in cart ";
 
