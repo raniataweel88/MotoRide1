@@ -14,5 +14,14 @@ namespace MotoRide.IServices
         public Task<ServiceResponse> AddMotorcycle(AddMotorcycleDto dto, IFormFile? images);
         public Task<ServiceResponse> UpdateMotorcycle(UpdateMotorcycleDto dto, IFormFile? images);
         public Task<ServiceResponse> DeleteMotorcycle(int motorcycleId);
+
+        public Task<ServiceResponse> SearchMotorcycle(string name);
+        public Task<ServiceResponse> FilteringMotorcycle(int shopId,string? sortBy, string? color, decimal? startPrice, decimal? EndPrice, decimal? mileage, int? year);
+        public  Task<ServiceResponse> MostPopularityMotorcycle();
+        public  Task<ServiceResponse> countSalesByShopId(int shopId);
+        public Task<ServiceResponse> MonthMotorcycleSalyes(int shop);
+
+        public Task<ServiceResponse> YearMotorcycleSalyes(int shop);
+        public  Task<ServiceResponse> TopMostPopularityMotorcycle();
     }
 }

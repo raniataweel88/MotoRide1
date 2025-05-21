@@ -21,10 +21,14 @@ namespace MotoRide.Dto
         public DateTime? Date { get; set; }
         public float? Fee { get; set; }//الرسوم
         public string? CustomerNote { get; set; }
-        public bool? StatusDelivery { get; set; }
+    
         public DateTime? RecivingDate { get; set; }
         public int? CustomerId { get; set; }
         public int? ShopOwnerId { get; set; } 
 
     }
+    public class UpdateStautsOrderDto
+    {
+        public int OrderItemId { get; set; }
+        public bool? StatusDelivery { get; set; }    }
 }

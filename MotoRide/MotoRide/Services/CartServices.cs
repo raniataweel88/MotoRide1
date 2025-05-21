@@ -74,7 +74,7 @@ namespace MotoRide.Services
                 Cart cart = new Cart
                 {
                     CustomerId = dto.CustomerId,
-                    CreatedAt = DateTime.Now,
+                    CreatedAt = DateTime.UtcNow,
 
                 };
 

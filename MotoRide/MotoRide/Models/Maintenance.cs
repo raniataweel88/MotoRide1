@@ -1,4 +1,6 @@
-﻿namespace MotoRide.Models
+﻿using MotoRide.Controllers;
+
+namespace MotoRide.Models
 {
     public class Maintenance
     {
@@ -14,5 +16,13 @@
         public List<Booking>? Bookings { get; set; } // قائمة الحجوزات المرتبطة بالصيانة
         public bool? IsActive { get; set; }
         public bool? IsCanLogin { get; set; }
+
+        // profile 
+        public List<CategoryMaintenance> Categories { get; set; } 
+        public string? Description { get; set; }
+        public int? WorkHoursId { get; set; }
+        public WorkHours? WorkHours { get; set; } 
+
+
     }
 }

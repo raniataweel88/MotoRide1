@@ -25,7 +25,9 @@ namespace MotoRide.Services
             try
             {
                 var order =  await _context.Orders
-                              .Where(x => x.IsActive != true)
+                              .Where(x => x.IsActive != true
+                              
+                              )
                               .ToListAsync();
                        
                 if (order == null)
@@ -51,23 +53,20 @@ namespace MotoRide.Services
                 var order = await _context.OrderItems
       .Include(x => x.Order)
       .Where(x => x.StoreId == shopId
-               && x.Order.IsActive != true
-               && x.Order.StatusDelivery == true)
+               && x.StatusDelivery == true)
       .GroupBy(x => new
       {
           x.OrderId,
           x.Order.Title,
-          x.Order.StatusPayment,
-          x.Order.RecivingDate
-
+        
       })
       .Select(group => new
       {
           OrderId = group.Key.OrderId,
           Title = group.Key.Title,
           TotalPrice = group.Sum(item => item.Price * item.Quantity),
-          StatusPayment = group.Key.StatusPayment,
-          RecivingDate = group.Key.RecivingDate,
+          StatusPayment = group.First().Order.StatusPayment,
+          RecivingDate = group.First().Order.RecivingDate,
       })
       .ToListAsync();
 
@@ -95,8 +94,8 @@ namespace MotoRide.Services
                 var order= await _context.OrderItems
       .Include(x => x.Order)
       .Where(x => x.StoreId == shopId
-               && x.Order.IsActive != true
-               && x.Order.StatusDelivery != true)
+               && x.Order.IsActive !=false
+               && (x.StatusDelivery == false||x.StatusDelivery==null))
       .GroupBy(x => new
       {
           x.OrderId,
@@ -137,7 +136,9 @@ namespace MotoRide.Services
             try
             {
                 var order = await _context.OrderItems
-                                .Where(x => x.StoreId == shopId && x.OrderId == orderId && x.Order.IsActive != true && x.Order.StatusDelivery == true)
+                                .Where(x => x.StoreId == shopId && x.OrderId == orderId && x.Order.IsActive != true && x.StatusDelivery == true)
+                                .Include(x => x.Order)
+                                .ThenInclude(x => x.Customer)
                               .ToListAsync();
 
                 if (order == null)
@@ -162,7 +163,9 @@ namespace MotoRide.Services
             try
             {
                 var order = await _context.OrderItems
-                                .Where(x => x.StoreId == shopId && x.OrderId == orderId && x.Order.IsActive != true && x.Order.StatusDelivery != true)
+                                .Where(x => x.StoreId == shopId && x.OrderId == orderId && x.Order.IsActive != true && x.StatusDelivery != true)
+                                .Include(x => x.Order)
+                                .ThenInclude(x => x.Customer)
                               .ToListAsync();
 
                 if (order == null)
@@ -208,14 +211,18 @@ namespace MotoRide.Services
             try
             {
                 var order = await _context.Orders.FirstOrDefaultAsync(x => x.OrderId == orderId);
-                var orderItems = await _context.OrderItems.Where(x => x.OrderId == orderId).Include(x=>x.Product).Include(x=>x.Motorcycle).ToListAsync();
+                var orderItems = await _context.OrderItems.Where(x => x.OrderId == orderId).Include(x=>x.Product).ThenInclude(x => x.Store).Include(x=>x.Motorcycle).ThenInclude(x => x.Store).ToListAsync();
+
+                var Customer = await _context.Customers.FirstOrDefaultAsync(x => x.CustomerId==order.CustomerId);
+
 
                 if (order == null)
                 {
                     _response.Message = $"can not get this {orderId} order";
                     _response.Success = false;
                 }
-                _response.Data = new { order, orderItems };
+                _response.Data = new { order, orderItems,Customer
+             };
                 _response.Success = true;
 
             }
@@ -285,9 +292,10 @@ namespace MotoRide.Services
                     CustomerId = dto.CustomerId,
                     TotalPrice = dto.TotalPrice,
                     RecivingDate = dto.RecivingDate,
-                    IsActive = false,
+                    IsActive = true,
+
                     CustomerNote = dto.CustomerNote,
-                    CreatedAt = DateTime.Now,
+                    CreatedAt = DateTime.UtcNow,
                     StatusPayment = dto.StatusPayment,
                 };
                 await _context.Orders.AddAsync(o);
@@ -312,9 +320,10 @@ namespace MotoRide.Services
                         MotorcycleId = item.MotorcycleId,
                         Size = item.Size,
                         OrderId=o.OrderId,
+                         StatusDelivery=false,
                         Name = product?.Name ?? motorcycle?.Name ?? "",
                         Quantity = (int)item.Quantity,
-                        Image= product?.Images ?? motorcycle?.Images ?? "",
+                        Image = product?.Images ?? motorcycle?.Images ?? "",
                         ProductId = item.ProductId,
                         Price = product?.Price ?? motorcycle?.Price ?? 0, // إذا كان أحدهما غير متوفر، استخدم الآخر
                         StoreId = product?.StoreId ?? motorcycle?.StoreId ?? 0,
@@ -328,12 +337,14 @@ namespace MotoRide.Services
                 }
 
                
-               var user=await _context.Users.FirstOrDefaultAsync(x => x.UserId == dto.CustomerId);
+               var user=await _context.Customers.FirstOrDefaultAsync(x => x.CustomerId == dto.CustomerId);
                 user.Phone = dto.Phone;
                 user.Location = dto.Location;
                 if (_customer != null)
                 {
                     await _customer.AddPoints(dto.CustomerId ?? 0, 20);
+                    _context.Customers.Update(user);
+                    await _context.SaveChangesAsync();
                 }
 
                 _response.Message = "Order added successfully.";
@@ -366,7 +377,6 @@ namespace MotoRide.Services
                     TotalPrice = dto.TotalPrice,
                     RecivingDate = dto.RecivingDate,
                     IsActive = false,
-                    StatusDelivery = dto.StatusDelivery,
                     CustomerNote = dto.CustomerNote,
                     CreatedAt = DateTime.Now,
                 };
@@ -383,6 +393,37 @@ namespace MotoRide.Services
             return _response;
 
         }
+        public async Task<ServiceResponse> UpdateStautsOrder(List<UpdateStautsOrderDto> dto)
+        {
+            try
+            {
+               foreach(var item in dto)
+                {
+                    var order = await _context.OrderItems.FirstOrDefaultAsync(x => x.OrderItemId == item.OrderItemId);
+                    if (order == null)
+                    {
+                        _response.Message = $"can not get this {item.OrderItemId} order";
+                        _response.Success = false;
+                    }
+                    else {
+                    order.StatusDelivery = item.StatusDelivery;
+                    _context.OrderItems.Update(order);
+                    await _context.SaveChangesAsync();
+                } 
+                }
+                _response.Message = "done to UpdateStauts order";
+                _response.Success = true;
+
+            }
+            catch (Exception e)
+            {
+                _response.Message = $"can not add stauts in order" + e.Message;
+                _response.Success = false;
+            }
+            return _response;
+
+        }
+
         public async Task<ServiceResponse> DeleteOrder(int orderId)
         {
             try
@@ -431,27 +472,38 @@ namespace MotoRide.Services
             }
             return _response;
         }
-        public async Task<ServiceResponse> GetOrderByIdForthisShop(int orderId ,int StoreId)
+        public async Task<ServiceResponse> GetOrderByIdForthisShop(int orderId, int StoreId)
         {
             try
             {
-                var orders = await _context.OrderItems.
-                    FirstOrDefaultAsync(x => x.OrderId == orderId&& x.StoreId == StoreId)
-                    ;
-                if (orders == null)
+                // Query for order items, including related Order and Customer data
+                var orders = await _context.OrderItems
+                    .Where(x => x.OrderId == orderId && x.StoreId == StoreId)
+                    .Include(x => x.Order)
+                    .ToListAsync();
+                var custome = await _context.Customers
+                  .Where(y => y.CustomerId == orders.First().Order.CustomerId).FirstOrDefaultAsync();
+               
+                // Check if no orders were found
+                if (orders == null || orders.Count == 0)
                 {
-                    _response.Message = $"can not get this order for this shop{StoreId}";
+                    _response.Message = $"Cannot find any orders for orderId {orderId} in shop {StoreId}.";
                     _response.Success = false;
                 }
-                _response.Data = orders;
-                _response.Success = true;
-
+                else
+                {
+                    // Successfully retrieved the orders
+                    _response.Data = new { orders, custome };
+                    _response.Success = true;
+                }
             }
             catch (Exception e)
             {
-                _response.Message = $"can not get this order for this shop{StoreId}"+e.Message;
+                // Log exception (you can log to a file or database for production use)
+                _response.Message = $"An error occurred while retrieving orders for shop {StoreId}: {e.Message}";
                 _response.Success = false;
             }
+
             return _response;
         }
     }

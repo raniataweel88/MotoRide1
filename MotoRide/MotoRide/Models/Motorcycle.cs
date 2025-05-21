@@ -7,8 +7,6 @@ namespace MotoRide.Models
         public int MotorcycleId { get; set;}
         public string? Name { get; set;}
         public string? Description { get; set; }
-        public int? CategoryId { get; set; }
-        public Category? Category { get; set; }
         public string? Colors { get; set; }
         public decimal Price { get; set; }
         public string? EngineType { get; set; }  // نوع المحرك
@@ -21,7 +19,7 @@ namespace MotoRide.Models
         public int StoreId { get; set;}
         public int? RemainingQuantity { get; set; }
         public Store? Store { get;set;}
-public List<Review>? Reviews { get; set; }
+        public List<Review>? Reviews { get; set; }
         public DateTime? CreatedAt { get; set; }
         public bool? IsActive { get; set; }
     }

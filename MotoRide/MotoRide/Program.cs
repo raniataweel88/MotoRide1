@@ -55,14 +55,19 @@ builder.Services.AddScoped<IOrderServices, OrderServices>();
 builder.Services.AddScoped<IMotocyleService, MotocyleService>();
 builder.Services.AddScoped<ICartItemServices, CartItemServices>();
 builder.Services.AddScoped<ICartServices, CartServices>();
-builder.Services.AddScoped<ISubCategoryServices, SubCategoryServices>();
-
-builder.Services.AddScoped<ICatrgoiresServices, CatrgoiresServices>();
+builder.Services.AddScoped<ICategoryProductServices, CategoryProductServices>();
+builder.Services.AddScoped<IBookingServices, BookingServices>();
+builder.Services.AddScoped<IMaintanceServices, MaintanceServices>(); 
+builder.Services.AddScoped<ICategoryMaintenancesServices, CategoryMaintenancesServices>();
 builder.Services.AddScoped<ImageServices>();
 builder.Services.AddScoped<ICustomerServices, CustomerServices>();
 builder.Services.AddScoped<IReviewServices, ReviewServices>();
 builder.Services.AddScoped<IWishListServices, WishListServices>();
+builder.Services.AddScoped<IEventsServices, EventsServices>();
+builder.Services.AddScoped<IAdminServices, AdminServices>();
+builder.Services.AddScoped<IReviewMaintenanceServies, ReviewMaintenanceServies>();
 builder.Services.AddScoped<IStoreServices, StoreServices>();
+builder.Services.AddScoped<INotificationBookingMaintenanceServices, NotificationBookingMaintenanceServices>();
 builder.Services.AddScoped<ServiceResponse>();
 // Add CORS policy
 builder.Services.AddCors(options =>

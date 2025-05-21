@@ -14,21 +14,22 @@ namespace MotoRide.Controllers
         private readonly IAuthenticationServices _authentication;
         private readonly IProductSerives _productSerives;
         private readonly IMotocyleService _motocyleService;
-        private readonly ISubCategoryServices _subCategoryServices;
+        private readonly ICategoryProductServices _CategoryProductServices;
         private readonly IOrderServices _orderServices;
         private readonly ImageServices imageServices;
         private readonly IReviewServices _reviewServices;
-
+        private readonly IStoreServices _store;
         public ShopOwnerController(IAuthenticationServices authentication, IProductSerives productSerives, IMotocyleService motocyleService,ImageServices image,
-            ISubCategoryServices subCategory, IOrderServices orderServices, IReviewServices reviewServices)
+            ICategoryProductServices CategoryProduct, IOrderServices orderServices, IReviewServices reviewServices,IStoreServices store)
         {
             _authentication = authentication;
             imageServices = image;
             _productSerives = productSerives;
             _motocyleService = motocyleService;
-            _subCategoryServices = subCategory;
+            _CategoryProductServices = CategoryProduct;
             _orderServices = orderServices;
             _reviewServices = reviewServices;
+            _store = store;
         }
 
 
@@ -98,44 +99,109 @@ namespace MotoRide.Controllers
             if (response.Success) { return Ok(response); }
             return BadRequest(response);
         }
-        #endregion
-        #region SubCategory
-        [HttpGet("GetSubCategory/${id}")]
-        public async Task<IActionResult> GetSubCategory(int id)
+      
+        [HttpGet("MonthMotorcycleSalyes/${id}")]
+        public async Task<IActionResult> MonthMotorcycleSalyes(int id)
         {
-            var response = await _subCategoryServices.GetSubCategory(id);
+            var response = await _motocyleService.MonthMotorcycleSalyes(id);
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
+        [HttpGet("YearMotorcycleSalyes/${id}")]
+        public async Task<IActionResult> YearMotorcycleSalyes(int id)
+        {
+            var response = await _motocyleService.YearMotorcycleSalyes(id);
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
+        [HttpGet("CountSalesByShopId/{shopId}")]
+        public async Task<IActionResult> countSalesByShopId(int shopId)
+        {
+            var response = await _motocyleService.countSalesByShopId(shopId);
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
+        [HttpGet("TopMotorcycleSalyes/{shopId}")]
+        public async Task<IActionResult> TopMotorcycleSalyes(int shopId)
+        {
+            var response = await _store.TopMotorcycleSalyes(shopId);
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
+        [HttpGet("TopProductSalyes/{id}")]
+        public async Task<IActionResult> TopProductSalyes(int id)
+        {
+            var response = await _store.TopProductSalyes(id);
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
+        [HttpGet("GetYearlySalesAsync/{shopId}")]
+        public async Task<IActionResult> GetYearlySalesAsync(int shopId)
+        {
+            var response = await _store.GetYearlySalesAsync(shopId);
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+       
+    }
+    [HttpGet("Salyes/{shopId}")]
+    public async Task<IActionResult> Salyes(int shopId)
+    {
+        var response = await _store.Salyes(shopId);
+        if (response.Success) { return Ok(response); }
+        return BadRequest(response);
+    }
+        [HttpGet("CountMotorcycle/{id}")]
+        public async Task<IActionResult> CountMotorcycle(int id)
+        {
+            var response = await _store.CountMotorcycle(id);
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
+        [HttpGet("CountProduct/{shopId}")]
+        public async Task<IActionResult> CountProduct(int shopId)
+        {
+            var response = await _store.CountProduct(shopId);
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
+        [HttpGet("CountProductAndCategory/{shopId}")]
+        public async Task<IActionResult> CountProductAndCategory(int shopId)
+        {
+            var response = await _store.CountProductAndCategory(shopId);
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
+        #endregion
+        #region CategoryProduct
+        [HttpGet("GetCategoryProduct/${id}")]
+        public async Task<IActionResult> GetCategoryProduct(int id)
+        {
+            var response = await _CategoryProductServices.GetCategoryProduct(id);
             if (response.Success)
             {
                 return Ok(response);
             }
             return BadRequest(response);
         }
-       
-        [HttpGet("GetAllSubCategoryByShop/${id}")]
-        public async Task<IActionResult> GetAllSubCategoryByShop(int id)
+      
+        [HttpPost("AddCategoryProduct")]
+        public async Task<IActionResult> AddCategoryProduct([FromBody] CategoryProductDto sc)
         {
-            var response = await _subCategoryServices.GetAllSubCategoryByShop(id);
+            var response = await _CategoryProductServices.AddCategoryProduct(sc);
             if (response.Success) { return Ok(response); }
             return BadRequest(response);
         }
-        [HttpPost("AddSubCategory")]
-        public async Task<IActionResult> AddSubCategory([FromBody] SubCategoryDto sc)
+        [HttpPut("UpdateCategoryProduct")]
+        public async Task<IActionResult> UpdateCategoryProduct([FromBody] UpdateCategoryProductDto sc)
         {
-            var response = await _subCategoryServices.AddSubCategory(sc);
+            var response = await _CategoryProductServices.UpdateCategoryProduct(sc);
             if (response.Success) { return Ok(response); }
             return BadRequest(response);
         }
-        [HttpPut("UpdateSubCategory")]
-        public async Task<IActionResult> UpdateSubCategory([FromBody] UpdateSubCategoryDto sc)
+        [HttpDelete("DeleteCategoryProduct/${id}")]
+        public async Task<IActionResult> DeleteCategoryProduct(int id)
         {
-            var response = await _subCategoryServices.UpdateSubCategory(sc);
-            if (response.Success) { return Ok(response); }
-            return BadRequest(response);
-        }
-        [HttpDelete("DeleteSubCategory/${id}")]
-        public async Task<IActionResult> DeleteSubCategory(int id)
-        {
-            var response = await _subCategoryServices.DeleteSubCategory(id);
+            var response = await _CategoryProductServices.DeleteCategoryProduct(id);
             if (response.Success) { return Ok(response); }
             return BadRequest(response);
         }
@@ -181,6 +247,13 @@ namespace MotoRide.Controllers
         public async Task<IActionResult> GetItemOrderReceivedByShop(int orderId, int shopId)
         {
             var response = await _orderServices.GetItemOrderReceivedByShop(orderId, shopId);
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
+        [HttpPut("UpdateStautsOrder")]
+        public async Task<IActionResult> UpdateStautsOrder(List<UpdateStautsOrderDto> dto)
+        {
+            var response = await _orderServices.UpdateStautsOrder(dto);
             if (response.Success) { return Ok(response); }
             return BadRequest(response);
         }

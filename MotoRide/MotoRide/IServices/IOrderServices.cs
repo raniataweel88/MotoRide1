@@ -9,6 +9,7 @@ namespace MotoRide.IServices
         public Task<ServiceResponse> GetAllOrder();
         public Task<ServiceResponse> AddOrder(AddOrderDto dto);
         public Task<ServiceResponse> UpdateOrder(UpdateOrderDto d);
+        public  Task<ServiceResponse> UpdateStautsOrder(List<UpdateStautsOrderDto> dto);
         public Task<ServiceResponse> DeleteOrder(int cartId);
         public  Task<ServiceResponse> GetAllOrderForthisShop(int shopId);
         public Task<ServiceResponse> GetAllOrderNotReceivedByShop(int shopId); 

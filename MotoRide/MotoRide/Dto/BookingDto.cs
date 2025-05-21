@@ -9,13 +9,9 @@ namespace MotoRide.Dto
         public DateTime? Date { get; set; }
         public string? CustomerNote { get; set; }
         public int? CustomerId { get; set; }
-        public int? MaintenanceId { get; set; }
-        public string? MaintenanceNote { get; set; }
-        public int? PaymentmethodId { get; set; }
         public string? Location { get; set; }
         public string? BikeType { get; set; } // مثال: "هوائية", "كهربائية"
-        public string? ImageUrl { get; set; } // رابط الصورة
-        public int? InvoiceId { get; set; }
+        public IFormFile? ImageUrl { get; set; } // رابط الصورة
     }
     public class UpdateBookingDto
     {
@@ -31,21 +27,33 @@ namespace MotoRide.Dto
         public int? PaymentmethodId { get; set; }
         public string? Location { get; set; }
         public string? BikeType { get; set; } // مثال: "هوائية", "كهربائية"
-        public string? ImageUrl { get; set; } // رابط الصورة
-        public int? InvoiceId { get; set; }
+        public IFormFile? ImageUrl { get; set; } // رابط الصورة
 
     }
+
     public class AddResponseBookingDto
     {
         public int BookingId { get; set; }
-        public float? InitialTotalPrice { get; set; }
-        public bool? IsAcceptableMaintaince { get; set; }
+        public int? MaintenanceId { get; set; }
+        public string? MaintenanceNote { get; set; }
+        public float? TotalPrice { get; set; }
+
+        public bool? IsAcceptableUserBooking { get; set; }
 
     }
-    public class AddResponseCustomerBookingDto
+    public class AddBookingSpecificBookingDto
     {
-        public int BookingId { get; set; }
-        public bool? IsAcceptableUserIntialPrice { get; set; }
+        public int MaintenanceId { get; set; }
 
+        public string? Title { get; set; }
+
+        public DateTime? Date { get; set; }
+        public string? CustomerNote { get; set; }
+        public int? CustomerId { get; set; }
+        public string? Location { get; set; }
+        public string? BikeType { get; set; } // مثال: "هوائية", "كهربائية"
+        public IFormFile? ImageUrl { get; set; } // رابط الصورة
     }
+
+    
 }

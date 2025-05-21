@@ -13,11 +13,7 @@ namespace MotoRide.Models
         public  void modelBuilder(ModelBuilder modelBuilder)
         {
 
-            #region User
-            modelBuilder.Entity<User>().HasKey(u => u.UserId);
-            modelBuilder.Entity<User>().Property(u => u.UserId).UseIdentityColumn();
-            modelBuilder.Entity<User>().Property(u => u.Username).IsUnicode(true);
-            #endregion
+          
             #region ShopOwner
             modelBuilder.Entity<Store>().HasKey(u => u.StoreId);
             modelBuilder.Entity<Store>().Property(u => u.StoreId).UseIdentityColumn();
@@ -45,14 +41,7 @@ namespace MotoRide.Models
             modelBuilder.Entity<CartItem>().HasKey(u => u.CartItemId);
             modelBuilder.Entity<CartItem>().Property(u => u.CartItemId).UseIdentityColumn();
             #endregion
-            #region Categories
-            modelBuilder.Entity<Category>().HasKey(u => u.CategoryId);
-            modelBuilder.Entity<Category>().Property(u => u.CategoryId).UseIdentityColumn();
-            #endregion
-            #region SubCategory
-            modelBuilder.Entity<SubCategory>().HasKey(u => u.SubCategoryId);
-            modelBuilder.Entity<SubCategory>().Property(u => u.SubCategoryId).UseIdentityColumn();
-            #endregion
+          
             #region Order
             modelBuilder.Entity<Order>().HasKey(u => u.OrderId);
             modelBuilder.Entity<Order>().Property(u => u.OrderId).UseIdentityColumn();
@@ -87,25 +76,34 @@ namespace MotoRide.Models
             modelBuilder.Entity<WishList>().HasKey(u => u.WishListId);
             modelBuilder.Entity<WishList>().Property(u => u.WishListId).UseIdentityColumn();
             #endregion
-          
 
+            modelBuilder.Entity<Maintenance>()
+       .HasMany(m => m.Categories)
+       .WithMany(c => c.Maintenance)
+       .UsingEntity(j => j.ToTable("MaintenanceCategories")); // اسم الجدول الوسيط
         }
 
+        public DbSet<Customer> Customers { get; set; }
         public DbSet<User> Users { get; set; }
+
         public DbSet<Motorcycle> Motorcycles {  get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
-        public DbSet<Category> Categories { get; set; }
+        public DbSet<CategoryMaintenance> CategoryMaintenances { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<SubCategory> SubCategories { get; set; }
+        public DbSet<CategoryProduct> CategoryProducts { get; set; }
         public DbSet<Store> Stores { get; set; }
         public DbSet<WishList> WishLists { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<Maintenance> Maintenances { get; set; }
-        public DbSet<Invoice> Invoices { get; set; }
+        public DbSet<WorkHours> WorkHours { get; set; }
+        public DbSet<NotificationBookingMaintenance> NotificationBookingMaintenances { get; set; }
+        public DbSet<Event> Events { get; set; }
+        public DbSet<ReviewMaintenance> ReviewMaintenances { get; set; }
+        public DbSet<Ticket> Tickets { get; set; }
 
     }
 }

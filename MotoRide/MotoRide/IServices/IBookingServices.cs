@@ -1,26 +1,22 @@
-﻿using Azure;
-using INTEGRATEDAPI.Shared;
-using Microsoft.EntityFrameworkCore;
+﻿using INTEGRATEDAPI.Shared;
 using MotoRide.Dto;
 
 namespace MotoRide.IServices
 {
     public interface IBookingServices 
     {
+        public Task<ServiceResponse> GetBooking(int bookingId);
         public Task<ServiceResponse> AddBooking(AddBookingDto dto);
-        public Task<ServiceResponse> UpdateBooking(UpdateBookingDto dto);
-        public Task<ServiceResponse> GetAllBookingNotRejectforMantaince(int maintenanceId);
+        public Task<ServiceResponse> GetAllBookingRejectforMantaince(int maintenanceId);
         public Task<ServiceResponse> GetAllBookingAcceptforMantaince(int maintenanceId);
+        public  Task<ServiceResponse> GetAllBookingPreviousforCustomer(int customerId);
+        public  Task<ServiceResponse> GetAllBookingNotReplyforMantaince(int MaintenanceId);
 
-        public  Task<ServiceResponse> GetAllBookingNotAcceptforMantaince(int maintenanceId);
-        public Task<ServiceResponse> GetAllBookingNotRejectforCustomer(int customerId);
+        public Task<ServiceResponse> GetAllBookingNotReplyforCustomer(int id);
+        public  Task<ServiceResponse> GetAllBookingnotConfirmforCustomer(int id);
+        public Task<ServiceResponse> GetAllBookingAcceptforCustomer(int id);
 
-        public Task<ServiceResponse> GetAllBookingAcceptforCustomer(int customerId);
-
-        public Task<ServiceResponse> GetAllBookingNotAcceptforCustomer(int customerId);
-
-        public Task<ServiceResponse> AddResponseForBooking(AddResponseBookingDto dto);
-
-        public Task<ServiceResponse> AddResponseForBookingForCustomer(AddResponseCustomerBookingDto dto);
+        public  Task<ServiceResponse> GetAllBookingConfrimed();
+        public  Task<ServiceResponse> AddSpecificBooking(AddBookingSpecificBookingDto dto);
     }
 }

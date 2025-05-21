@@ -8,6 +8,7 @@ using MotoRide.IServices;
 using MotoRide.Models;
 using MotoRide.Services;
 using System.Net;
+using System.Numerics;
 
 namespace MotoRide.Controllers
 {
@@ -16,26 +17,31 @@ namespace MotoRide.Controllers
     public class SharedController : ControllerBase
     {
         private readonly IAuthenticationServices _authservices;
-        private readonly ICatrgoiresServices _categoryServices;
-        private readonly ISubCategoryServices _subCategoryServices;
+        private readonly ICategoryMaintenancesServices _categoryMaintenancesServices;
+        private readonly ICategoryProductServices _categoryProductServices;
         private readonly IStoreServices _StoreServices;
         private readonly IReviewServices _reviewServices;
+        private readonly IMaintanceServices _maintanceServices;
+        private readonly IReviewMaintenanceServies _reviewMaintenanceServies;
 
-        public SharedController(IAuthenticationServices authservices, ICatrgoiresServices categoryServices, ISubCategoryServices subCategoryServices, IStoreServices storeServices, IReviewServices reviewServices)
+
+        public SharedController(IAuthenticationServices authservices,
+            ICategoryMaintenancesServices categoryMaintenancesServices,
+            ICategoryProductServices subCategoryServices, 
+            IStoreServices storeServices, 
+            IReviewServices reviewServices, 
+            IReviewMaintenanceServies reviewMaintenanceServies,
+            IMaintanceServices maintanceServices)
         {
             _authservices = authservices;
-            _categoryServices = categoryServices;
-            _subCategoryServices = subCategoryServices;
+            _categoryMaintenancesServices = categoryMaintenancesServices;
+            _categoryProductServices = subCategoryServices;
             _StoreServices = storeServices;
             _reviewServices = reviewServices;
+            _maintanceServices = maintanceServices;
+            _reviewMaintenanceServies= reviewMaintenanceServies;
         }
-        [HttpGet("GetAllSubCategory")]
-        public async Task<IActionResult> GetAllSubCategory()
-        {
-            var response = await _subCategoryServices.GetAllSubCategory();
-            if (response.Success) { return Ok(response); }
-            return BadRequest(response);
-        }
+     
         #region Authntication
         [HttpPost("RegisterCustomer")]
         public async Task<IActionResult> RegisterCustomer([FromBody] AddCustomerDto dto)
@@ -70,6 +76,14 @@ namespace MotoRide.Controllers
             return BadRequest(response);
 
         }
+        [HttpPut("LoginGoverment")]
+        public async Task<IActionResult> LoginGoverment(LoginDto dto)
+        {
+            var response = await _authservices.LoginGoverment(dto);
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+
+        }
         [HttpPut("Logout")]
         public async Task<IActionResult> Logout(int id)
         {
@@ -88,27 +102,47 @@ namespace MotoRide.Controllers
         }
         #endregion
         #region Category
-        [HttpGet("GetAllCategories")]
-        public async Task<IActionResult> GetAllCategories()
+        [HttpGet("GetAllCategoryProduct")]
+        public async Task<IActionResult> GetAllCategoryProduct()
         {
-            var response = await _categoryServices.GetAllCatrgoires();
+            var response = await _categoryProductServices.GetAllCategoryProduct();
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
+        [HttpGet("GetAllCategoryMaintenances")]
+        public async Task<IActionResult> GetAllCategoryMaintenances()
+        {
+            var response = await _categoryMaintenancesServices.GetAllCategoryMaintenances();
             if (response.Success)
             {
                 return Ok(response);
             }
             return BadRequest(response);
+
         }
+    
         [HttpGet("GetCategory/{id}")]
         public async Task<IActionResult> GetCategory(int id)
         {
-            var response = await _categoryServices.GetCatrgoires(id);
+            var response = await _categoryMaintenancesServices.GetCategoryMaintenances(id);
             if (response.Success)
             {
                 return Ok(response);
             }
             return BadRequest(response);
         }
+
+        [HttpGet("GetAllCategoryProductByShop/${id}")]
+        public async Task<IActionResult> GetAllCategoryProductByShop(int id)
+        {
+            var response = await _categoryProductServices.GetAllCategoryProductByStore(id);
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
+      
         #endregion
+
+        #region store
         [HttpGet("GetAllShop")]
         public async Task<IActionResult> GetAllShop()
         {
@@ -116,19 +150,29 @@ namespace MotoRide.Controllers
             if (response.Success) { return Ok(response); }
             return BadRequest(response);
         }
-        [HttpPut("AllowStoreToLogin")]
-        public async Task<IActionResult> AllowStoreToLogin(int id,bool isAllowLogin)
+        [HttpGet("TopProductSalyes/{id}")]
+        public async Task<IActionResult> TopProductSalyes(int id)
         {
-            var response = await _StoreServices.AllowStoreToLogin(id,isAllowLogin);
+            var response = await _StoreServices.TopProductSalyes(id);
             if (response.Success) { return Ok(response); }
             return BadRequest(response);
         }
+
+        #endregion
         #region Review
-        [HttpGet("GetAllReviewForThisItem")]
-        public async Task<IActionResult> GetAllReviewForThisItem(int? productId, int? motorcycleId)
+        [HttpGet("GetAllReviewForThisProd/{productId}")]
+        public async Task<IActionResult> GetAllReviewForThisProd(int productId)
         {
 
-            var response = await _reviewServices.GetAllReviewForThisItem(productId, motorcycleId);
+            var response = await _reviewServices.GetAllReviewForThisProd(productId);
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
+        [HttpGet("GetAllReviewForThisMoto/{productId}")]
+        public async Task<IActionResult> GetAllReviewForThisMoto(int productId)
+        {
+
+            var response = await _reviewServices.GetAllReviewForThisMoto(productId);
             if (response.Success) { return Ok(response); }
             return BadRequest(response);
         }
@@ -140,11 +184,53 @@ namespace MotoRide.Controllers
             if (response.Success) { return Ok(response); }
             return BadRequest(response);
         }
+     
         [HttpGet("GetDeleteReview")]
         public async Task<IActionResult> GetDeleteReview(GetDeleteStoreDto dto)
         {
 
             var response = await _reviewServices.GetDeleteReview(dto);
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
+
+        [HttpGet("GetReviewMaintenance/${id}")]
+        public async Task<IActionResult> GetReviewMaintenance(int id)
+        {
+
+            var response = await _reviewMaintenanceServies.GetReviewMaintenance(id);
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
+
+        [HttpGet("GetDeleteReviewMaintenance")]
+        public async Task<IActionResult> GetDeleteReviewMaintenance(GetDeleteReviewMaintenanceDto dto)
+        {
+
+            var response = await _reviewMaintenanceServies.GetDeleteReviewMaintenance(dto);
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
+        #endregion
+        #region Maintenance
+        [HttpGet("GetAllMaintance")]
+        public async Task<IActionResult> GetAllMaintance()
+        {
+            var response = await _maintanceServices.GetAllMaintance();
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
+        [HttpGet("GetAllMaintanceByCategory/{id}")]
+        public async Task<IActionResult> GetAllMaintanceByCategory(int id)
+        {
+            var response = await _maintanceServices.GetAllMaintanceByCategory(id);
+            if (response.Success) { return Ok(response); }
+            return BadRequest(response);
+        }
+        [HttpGet("SearchMaintenance")]
+        public async Task<IActionResult> SearchMaintenance(string? name)
+        {
+            var response = await _maintanceServices.SearchMaintenance(name);
             if (response.Success) { return Ok(response); }
             return BadRequest(response);
         }

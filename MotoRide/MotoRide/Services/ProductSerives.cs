@@ -1,6 +1,7 @@
 ﻿using INTEGRATEDAPI.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.IdentityModel.Tokens;
 using MotoRide.Dto;
 using MotoRide.IServices;
 using MotoRide.Models;
@@ -99,8 +100,7 @@ namespace MotoRide.Services
                     Images = $"http://localhost:5147{product.Images}",
                     Price = product.Price,
                     ShopOwnerId = product.StoreId,
-                    CategoryId = product.CategoryId,
-                    SubCategoryId = product.SubCategoryId,
+                    CategoryProductId = product.CategoryProductId,
                     Quantity = product.Quantity,
                 };
 
@@ -119,7 +119,7 @@ namespace MotoRide.Services
         {
             try
             {
-                var products = from p in _context.Products.Where(x => x.SubCategoryId == categoryId && x.IsActive != false)
+                var products = from p in _context.Products.Where(x => x.CategoryProductId == categoryId && x.IsActive != false)
                                               select new CardProductDto
                                               {
                                                   ProductId = p.ProductId,
@@ -161,11 +161,10 @@ namespace MotoRide.Services
                     Price = dto.Price,
                     Quantity = dto.Quantity,
                     Sizes = dto.Sizes,
-                    SubCategoryId = dto.SubCategoryId,
+                    CategoryProductId = dto.CategoryProductId,
                     Colors = dto.Colors,
                     Name = dto.Name,
                     RemainingQuantity = dto.Quantity,
-                    CategoryId = 1,
                     Images = productImagePath,
                     Description = dto.Description,
                     StoreId = dto.StoreId,
@@ -209,7 +208,6 @@ namespace MotoRide.Services
                 product.Colors = dto.Colors;
                 product.Name = dto.Name;
                 product.ProductId = dto.ProductId;
-                product.CategoryId = 1;
                   if(productImagePath!=null)
                 product.Images = productImagePath;
                     product.RemainingQuantity = dto.Quantity;
@@ -289,5 +287,171 @@ namespace MotoRide.Services
             }
             return _response;
         }
+
+        public async Task<ServiceResponse> SearchProduct(string name)
+        {
+            {
+                try
+                {
+                    var product = from p in await _context.Products
+                                  .Where(x => x.IsActive != false && (x.Name.ToLower().Contains(name.ToLower())|| x.Description.ToLower().Contains(name.ToLower())))
+                                  .ToListAsync()
+                                  select new CardProductDto
+                                  {
+                                      ProductId = p.ProductId,
+                                      Name = p.Name,
+                                      Images = $"http://localhost:5147{p.Images}",
+                                      Price = p.Price,
+                                  };
+                    if (product == null)
+                    {
+                        _response.Message = "can not get any product";
+                        _response.Success = false;
+                    }
+                    _response.Data = product;
+                    _response.Success = true;
+
+                }
+                catch (Exception e)
+                {
+                    _response.Message = "can not get all product" + e.Message;
+                    _response.Success = false;
+                }
+                return _response;
+            }
+        }
+        public async Task<ServiceResponse> MostPopularityProduct()
+        {
+            try
+            {
+                var response = new ServiceResponse();
+
+                var product = await _context.OrderItems.Include(x => x.Product).
+                    GroupBy(x => x.ProductId)
+                    .Select(x => new {
+                        x.First().ProductId,
+                        x.First().Product.Name,
+                        x.First().Image,
+                        OrderCount = x.Count()
+                    }).ToListAsync();
+
+
+
+                if (product == null)
+                {
+                    _response.Message = "can not get any Motorcycles";
+                    _response.Success = false;
+                }
+                _response.Data = product.OrderByDescending(x => x.OrderCount).FirstOrDefault();
+                _response.Success = true;
+
+            }
+            catch (Exception e)
+            {
+                _response.Message = "can not get all Motorcycle" + e.Message;
+                _response.Success = false;
+            }
+            return _response;
+        }
+
+        public async Task<ServiceResponse> FilteringProduct(int shopId,string? sortBy, string? color, decimal? startPrice, decimal? EndPrice)
+        {
+            var response = new ServiceResponse();
+
+            try
+            {
+                var query = _context.Products.Where(x=>x.StoreId== shopId).AsQueryable();
+
+                if (!string.IsNullOrEmpty(color))
+                {
+                    query = query.Where(m => m.Colors == color);
+                }
+
+                if (startPrice != null || EndPrice != null)
+                {
+                    if (startPrice == null) startPrice = 0;
+                    if (EndPrice == null) EndPrice = decimal.MaxValue;
+
+                    query = query.Where(m => m.Price >= startPrice && m.Price <= EndPrice);
+                }
+
+                if (!string.IsNullOrEmpty(sortBy))
+                {
+                    sortBy = sortBy.ToLower();
+
+                    if (sortBy == "price_desc") query = query.OrderByDescending(m => m.Price);
+                    else if (sortBy == "price_all") query = query;
+                    else if (sortBy == "price_asc") query = query.OrderBy(m => m.Price);
+                    else
+                    {   if (sortBy == "default") query = query;
+                        else if(sortBy == "newness") query = query.OrderByDescending(m => m.CreatedAt);
+                        else if (sortBy == "popularity")
+                        {
+                            var query2 = await _context.OrderItems
+                                .Include(x => x.Product)
+                                .GroupBy(x => x.ProductId)
+                                .Select(x => new
+                                {
+                                    ProductId = x.Key,
+                                    ProductName = x.First().Product.Name,
+                                    Image = x.First().Image,
+                                    OrderCount = x.Count()
+                                }).ToListAsync();
+
+                            response.Data = query2;
+                            response.Success = true;
+                            return response;
+                        }
+                    }
+                }
+
+                var result = await query.ToListAsync();
+                response.Data = result;
+                response.Success = true;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
+        }
+
+        public async Task<ServiceResponse> TopMostPopularityProduct()
+        {
+            try
+            {
+                var response = new ServiceResponse();
+
+                var product = await _context.OrderItems.Where(x=>x.Product.IsActive!=false&&x.ProductId!=null).Include(x => x.Product).
+                    GroupBy(x => x.ProductId)
+                    .Select(x => new {
+                        x.First().ProductId,
+                        x.First().Product.Name,
+                        x.First().Image,
+                        x.First().Price,
+                        OrderCount = x.Count()
+                    }).ToListAsync();
+
+
+
+                if (product == null)
+                {
+                    _response.Message = "can not get any Motorcycles";
+                    _response.Success = false;
+                }
+                _response.Data = product.OrderByDescending(x => x.OrderCount).Take(20);
+                _response.Success = true;
+
+            }
+            catch (Exception e)
+            {
+                _response.Message = "can not get all Motorcycle" + e.Message;
+                _response.Success = false;
+            }
+            return _response;
+        }
+
     }
 }

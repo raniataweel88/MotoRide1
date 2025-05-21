@@ -18,6 +18,8 @@ namespace MotoRide.Services
         // 1. Create a new WishList
         public async Task<ServiceResponse> AddWishList(AddWishListDto dto)
         {
+            var wishListIfExist = _context.WishLists.Where(x => x.CustomerId == dto.CustomerId && (x.MotorcycleId == dto.MotorcycleId || x.ProductId == dto.ProductId)).Count();
+            if (wishListIfExist == 0) {
             var wishList = new WishList
             {
                 CustomerId = dto.CustomerId,
@@ -31,7 +33,7 @@ namespace MotoRide.Services
 
             _context.WishLists.Add(wishList);
             await _context.SaveChangesAsync();
-
+ }
             return new ServiceResponse { Success = true, Message = "WishList created successfully." };
         }
 

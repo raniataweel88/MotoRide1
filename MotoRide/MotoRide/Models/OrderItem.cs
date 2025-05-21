@@ -11,10 +11,12 @@
         public int Quantity { get; set; }
         public decimal Price { get; set; }
         public string? Name { get; set; }
-
+        public bool? StatusDelivery { get; set; }
+        public bool? StatusCompleteOrder { get; set; }
         public string? Color { get; set; }
         public string? Size { get; set; }
         public string? Image { get; set; }
+        public Store? store { get; set; }
         public DateTime CreatedAt { get; set; }
         public Product? Product { get; set; }
         public Order? Order { get; set; }

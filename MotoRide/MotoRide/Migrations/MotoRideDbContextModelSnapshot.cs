@@ -22,6 +22,21 @@ namespace MotoRide.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("CategoryMaintenanceMaintenance", b =>
+                {
+                    b.Property<int>("CategoriesCategoryMaintenanceId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaintenanceId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CategoriesCategoryMaintenanceId", "MaintenanceId");
+
+                    b.HasIndex("MaintenanceId");
+
+                    b.ToTable("CategoryMaintenanceMaintenance");
+                });
+
             modelBuilder.Entity("MotoRide.Models.Booking", b =>
                 {
                     b.Property<int>("BookingId")
@@ -48,16 +63,10 @@ namespace MotoRide.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<float?>("InitialTotalPrice")
-                        .HasColumnType("real");
-
-                    b.Property<int?>("InvoiceId")
-                        .HasColumnType("int");
-
                     b.Property<bool?>("IsAcceptableMaintaince")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("IsAcceptableUserIntialPrice")
+                    b.Property<bool?>("IsAcceptableUserBooking")
                         .HasColumnType("bit");
 
                     b.Property<bool?>("IsActive")
@@ -72,7 +81,7 @@ namespace MotoRide.Migrations
                     b.Property<string>("MaintenanceNote")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("PaymentmethodId")
+                    b.Property<int?>("NotificationBookingMaintenanceId")
                         .HasColumnType("int");
 
                     b.Property<string>("StatusBookingMaintenance")
@@ -88,11 +97,9 @@ namespace MotoRide.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("InvoiceId");
-
                     b.HasIndex("MaintenanceId");
 
-                    b.HasIndex("PaymentmethodId");
+                    b.HasIndex("NotificationBookingMaintenanceId");
 
                     b.ToTable("Bookings");
                 });
@@ -164,13 +171,13 @@ namespace MotoRide.Migrations
                     b.ToTable("CartItems");
                 });
 
-            modelBuilder.Entity("MotoRide.Models.Category", b =>
+            modelBuilder.Entity("MotoRide.Models.CategoryMaintenance", b =>
                 {
-                    b.Property<int>("CategoryId")
+                    b.Property<int>("CategoryMaintenanceId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryMaintenanceId"));
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -181,22 +188,135 @@ namespace MotoRide.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("CategoryId");
+                    b.HasKey("CategoryMaintenanceId");
 
-                    b.ToTable("Categories");
+                    b.ToTable("CategoryMaintenances");
                 });
 
-            modelBuilder.Entity("MotoRide.Models.Invoice", b =>
+            modelBuilder.Entity("MotoRide.Models.CategoryProduct", b =>
                 {
-                    b.Property<int>("InvoiceId")
+                    b.Property<int>("CategoryProductId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InvoiceId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryProductId"));
 
-                    b.HasKey("InvoiceId");
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
 
-                    b.ToTable("Invoices");
+                    b.Property<bool?>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("StoreId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CategoryProductId");
+
+                    b.ToTable("CategoryProducts");
+                });
+
+            modelBuilder.Entity("MotoRide.Models.Customer", b =>
+                {
+                    b.Property<int>("CustomerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerId"));
+
+                    b.Property<DateTime?>("BirthDay")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Gender")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("Level")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Points")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Token")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Username")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CustomerId");
+
+                    b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("MotoRide.Models.Event", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CreatAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Duration")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EndRouts")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EventType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("HaveTrollyProvider")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsApproved")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("MaxParticipaion")
+                        .HasColumnType("int");
+
+                    b.Property<bool?>("SendToGoverment")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("Time")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float?>("price")
+                        .HasColumnType("real");
+
+                    b.Property<string>("startRouts")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Events");
                 });
 
             modelBuilder.Entity("MotoRide.Models.Maintenance", b =>
@@ -209,6 +329,9 @@ namespace MotoRide.Migrations
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
@@ -237,7 +360,14 @@ namespace MotoRide.Migrations
                     b.Property<string>("Token")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("WorkHoursId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("WorkHoursId")
+                        .IsUnique()
+                        .HasFilter("[WorkHoursId] IS NOT NULL");
 
                     b.ToTable("Maintenances");
                 });
@@ -252,9 +382,6 @@ namespace MotoRide.Migrations
 
                     b.Property<string>("Brand")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("CategoryId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Colors")
                         .HasColumnType("nvarchar(max)");
@@ -300,11 +427,54 @@ namespace MotoRide.Migrations
 
                     b.HasKey("MotorcycleId");
 
-                    b.HasIndex("CategoryId");
-
                     b.HasIndex("StoreId");
 
                     b.ToTable("Motorcycles");
+                });
+
+            modelBuilder.Entity("MotoRide.Models.NotificationBookingMaintenance", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool?>("AcceptCustomer")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("AcceptMaintenance")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("BookingId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<bool?>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("Isfavourite")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("MaintenanceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("MaintenanceNote")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double?>("Price")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MaintenanceId");
+
+                    b.ToTable("NotificationBookingMaintenances");
                 });
 
             modelBuilder.Entity("MotoRide.Models.Order", b =>
@@ -327,9 +497,6 @@ namespace MotoRide.Migrations
                     b.Property<DateTime?>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DeliveryNote")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<float?>("Fee")
                         .HasColumnType("real");
 
@@ -341,12 +508,6 @@ namespace MotoRide.Migrations
 
                     b.Property<DateTime?>("RecivingDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool?>("StatusCompleteOrder")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("StatusDelivery")
-                        .HasColumnType("bit");
 
                     b.Property<string>("StatusPayment")
                         .HasColumnType("nvarchar(max)");
@@ -407,6 +568,12 @@ namespace MotoRide.Migrations
                     b.Property<string>("Size")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool?>("StatusCompleteOrder")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("StatusDelivery")
+                        .HasColumnType("bit");
+
                     b.Property<int>("StoreId")
                         .HasColumnType("int");
 
@@ -417,6 +584,8 @@ namespace MotoRide.Migrations
                     b.HasIndex("OrderId");
 
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("StoreId");
 
                     b.ToTable("OrderItems");
                 });
@@ -463,7 +632,7 @@ namespace MotoRide.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductId"));
 
-                    b.Property<int?>("CategoryId")
+                    b.Property<int?>("CategoryProductId")
                         .HasColumnType("int");
 
                     b.Property<string>("Colors")
@@ -499,16 +668,11 @@ namespace MotoRide.Migrations
                     b.Property<int?>("StoreId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("SubCategoryId")
-                        .HasColumnType("int");
-
                     b.HasKey("ProductId");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex("CategoryProductId");
 
                     b.HasIndex("StoreId");
-
-                    b.HasIndex("SubCategoryId");
 
                     b.ToTable("Products");
                 });
@@ -523,9 +687,6 @@ namespace MotoRide.Migrations
 
                     b.Property<bool?>("AdminNeedDeletedReview")
                         .HasColumnType("bit");
-
-                    b.Property<string>("AdminReason")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
@@ -568,6 +729,50 @@ namespace MotoRide.Migrations
                     b.HasIndex("StoreId");
 
                     b.ToTable("Reviews");
+                });
+
+            modelBuilder.Entity("MotoRide.Models.ReviewMaintenance", b =>
+                {
+                    b.Property<int>("ReviewMaintenanceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReviewMaintenanceId"));
+
+                    b.Property<bool?>("AdminNeedDeletedReview")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<bool?>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("MaintenanceId")
+                        .HasColumnType("int");
+
+                    b.Property<bool?>("MaintenanceNeedDeletedReview")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MaintenanceReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Rating")
+                        .HasColumnType("int");
+
+                    b.HasKey("ReviewMaintenanceId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("MaintenanceId");
+
+                    b.ToTable("ReviewMaintenances");
                 });
 
             modelBuilder.Entity("MotoRide.Models.Store", b =>
@@ -613,29 +818,33 @@ namespace MotoRide.Migrations
                     b.ToTable("Stores");
                 });
 
-            modelBuilder.Entity("MotoRide.Models.SubCategory", b =>
+            modelBuilder.Entity("MotoRide.Models.Ticket", b =>
                 {
-                    b.Property<int>("SubCategoryId")
+                    b.Property<int?>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SubCategoryId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"));
 
-                    b.Property<DateTime?>("CreatedAt")
+                    b.Property<DateTime?>("CreateAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool?>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ShopId")
+                    b.Property<int?>("EventId")
                         .HasColumnType("int");
 
-                    b.HasKey("SubCategoryId");
+                    b.Property<int?>("NumberOfGuest")
+                        .HasColumnType("int");
 
-                    b.ToTable("SubCategories");
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Tickets");
                 });
 
             modelBuilder.Entity("MotoRide.Models.User", b =>
@@ -649,26 +858,11 @@ namespace MotoRide.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool?>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("Level")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Location")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Password")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Points")
-                        .HasColumnType("int");
 
                     b.Property<string>("Token")
                         .HasColumnType("nvarchar(max)");
@@ -718,36 +912,101 @@ namespace MotoRide.Migrations
                     b.ToTable("WishLists");
                 });
 
+            modelBuilder.Entity("MotoRide.Models.WorkHours", b =>
+                {
+                    b.Property<int>("WorkHoursId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WorkHoursId"));
+
+                    b.Property<string>("EndFriday")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EndMonday")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EndSaturday")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EndSunday")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EndThursday")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EndTuesday")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EndWednesday")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("MaintanenceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("StartFriday")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StartMonday")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StartSaturday")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StartSunday")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StartThursday")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StartTuesday")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StartWednesday")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("WorkHoursId");
+
+                    b.ToTable("WorkHours");
+                });
+
+            modelBuilder.Entity("CategoryMaintenanceMaintenance", b =>
+                {
+                    b.HasOne("MotoRide.Models.CategoryMaintenance", null)
+                        .WithMany()
+                        .HasForeignKey("CategoriesCategoryMaintenanceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MotoRide.Models.Maintenance", null)
+                        .WithMany()
+                        .HasForeignKey("MaintenanceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("MotoRide.Models.Booking", b =>
                 {
-                    b.HasOne("MotoRide.Models.User", "Customer")
+                    b.HasOne("MotoRide.Models.Customer", "Customer")
                         .WithMany("Bookings")
                         .HasForeignKey("CustomerId");
-
-                    b.HasOne("MotoRide.Models.Invoice", "Invoice")
-                        .WithMany()
-                        .HasForeignKey("InvoiceId");
 
                     b.HasOne("MotoRide.Models.Maintenance", "Maintenance")
                         .WithMany("Bookings")
                         .HasForeignKey("MaintenanceId");
 
-                    b.HasOne("MotoRide.Models.Paymentmethod", "Paymentmethod")
-                        .WithMany()
-                        .HasForeignKey("PaymentmethodId");
+                    b.HasOne("MotoRide.Models.NotificationBookingMaintenance", null)
+                        .WithMany("Booking")
+                        .HasForeignKey("NotificationBookingMaintenanceId");
 
                     b.Navigation("Customer");
 
-                    b.Navigation("Invoice");
-
                     b.Navigation("Maintenance");
-
-                    b.Navigation("Paymentmethod");
                 });
 
             modelBuilder.Entity("MotoRide.Models.Cart", b =>
                 {
-                    b.HasOne("MotoRide.Models.User", "Customer")
+                    b.HasOne("MotoRide.Models.Customer", "Customer")
                         .WithMany("Cart")
                         .HasForeignKey("CustomerId");
 
@@ -775,26 +1034,38 @@ namespace MotoRide.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("MotoRide.Models.Maintenance", b =>
+                {
+                    b.HasOne("MotoRide.Models.WorkHours", "WorkHours")
+                        .WithOne("Maintenance")
+                        .HasForeignKey("MotoRide.Models.Maintenance", "WorkHoursId");
+
+                    b.Navigation("WorkHours");
+                });
+
             modelBuilder.Entity("MotoRide.Models.Motorcycle", b =>
                 {
-                    b.HasOne("MotoRide.Models.Category", "Category")
-                        .WithMany("MotorcycleList")
-                        .HasForeignKey("CategoryId");
-
                     b.HasOne("MotoRide.Models.Store", "Store")
                         .WithMany()
                         .HasForeignKey("StoreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Category");
-
                     b.Navigation("Store");
+                });
+
+            modelBuilder.Entity("MotoRide.Models.NotificationBookingMaintenance", b =>
+                {
+                    b.HasOne("MotoRide.Models.Maintenance", "Maintenance")
+                        .WithMany()
+                        .HasForeignKey("MaintenanceId");
+
+                    b.Navigation("Maintenance");
                 });
 
             modelBuilder.Entity("MotoRide.Models.Order", b =>
                 {
-                    b.HasOne("MotoRide.Models.User", "Customer")
+                    b.HasOne("MotoRide.Models.Customer", "Customer")
                         .WithMany("Order")
                         .HasForeignKey("CustomerId");
 
@@ -823,28 +1094,30 @@ namespace MotoRide.Migrations
                         .WithMany()
                         .HasForeignKey("ProductId");
 
+                    b.HasOne("MotoRide.Models.Store", "store")
+                        .WithMany()
+                        .HasForeignKey("StoreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Motorcycle");
 
                     b.Navigation("Order");
 
                     b.Navigation("Product");
+
+                    b.Navigation("store");
                 });
 
             modelBuilder.Entity("MotoRide.Models.Product", b =>
                 {
-                    b.HasOne("MotoRide.Models.Category", "Category")
-                        .WithMany("ProductList")
-                        .HasForeignKey("CategoryId");
+                    b.HasOne("MotoRide.Models.CategoryProduct", "SubCategory")
+                        .WithMany()
+                        .HasForeignKey("CategoryProductId");
 
                     b.HasOne("MotoRide.Models.Store", "Store")
                         .WithMany()
                         .HasForeignKey("StoreId");
-
-                    b.HasOne("MotoRide.Models.SubCategory", "SubCategory")
-                        .WithMany()
-                        .HasForeignKey("SubCategoryId");
-
-                    b.Navigation("Category");
 
                     b.Navigation("Store");
 
@@ -853,7 +1126,7 @@ namespace MotoRide.Migrations
 
             modelBuilder.Entity("MotoRide.Models.Review", b =>
                 {
-                    b.HasOne("MotoRide.Models.User", "Customer")
+                    b.HasOne("MotoRide.Models.Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId");
 
@@ -878,9 +1151,39 @@ namespace MotoRide.Migrations
                     b.Navigation("Store");
                 });
 
+            modelBuilder.Entity("MotoRide.Models.ReviewMaintenance", b =>
+                {
+                    b.HasOne("MotoRide.Models.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId");
+
+                    b.HasOne("MotoRide.Models.Maintenance", "Maintenance")
+                        .WithMany()
+                        .HasForeignKey("MaintenanceId");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Maintenance");
+                });
+
+            modelBuilder.Entity("MotoRide.Models.Ticket", b =>
+                {
+                    b.HasOne("MotoRide.Models.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId");
+
+                    b.HasOne("MotoRide.Models.Customer", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Event");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("MotoRide.Models.WishList", b =>
                 {
-                    b.HasOne("MotoRide.Models.User", "Customer")
+                    b.HasOne("MotoRide.Models.Customer", "Customer")
                         .WithMany("WishList")
                         .HasForeignKey("CustomerId");
 
@@ -904,11 +1207,15 @@ namespace MotoRide.Migrations
                     b.Navigation("CartItem");
                 });
 
-            modelBuilder.Entity("MotoRide.Models.Category", b =>
+            modelBuilder.Entity("MotoRide.Models.Customer", b =>
                 {
-                    b.Navigation("MotorcycleList");
+                    b.Navigation("Bookings");
 
-                    b.Navigation("ProductList");
+                    b.Navigation("Cart");
+
+                    b.Navigation("Order");
+
+                    b.Navigation("WishList");
                 });
 
             modelBuilder.Entity("MotoRide.Models.Maintenance", b =>
@@ -921,20 +1228,19 @@ namespace MotoRide.Migrations
                     b.Navigation("Reviews");
                 });
 
+            modelBuilder.Entity("MotoRide.Models.NotificationBookingMaintenance", b =>
+                {
+                    b.Navigation("Booking");
+                });
+
             modelBuilder.Entity("MotoRide.Models.Product", b =>
                 {
                     b.Navigation("Reviews");
                 });
 
-            modelBuilder.Entity("MotoRide.Models.User", b =>
+            modelBuilder.Entity("MotoRide.Models.WorkHours", b =>
                 {
-                    b.Navigation("Bookings");
-
-                    b.Navigation("Cart");
-
-                    b.Navigation("Order");
-
-                    b.Navigation("WishList");
+                    b.Navigation("Maintenance");
                 });
 #pragma warning restore 612, 618
         }

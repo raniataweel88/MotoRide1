@@ -93,7 +93,7 @@ namespace MotoRide.Services
         }
 
         // ✅ Get all reviews
-        public async Task<ServiceResponse> GetAllReviewForThisItem(int? ProductId, int? MotorcycleId)
+        public async Task<ServiceResponse> GetAllReviewForThisProd(int ProductId)
         {
             var response = new ServiceResponse();
 
@@ -101,15 +101,50 @@ namespace MotoRide.Services
             {
                 var reviews = await _context.Reviews 
                     .Include(r => r.Product)
-                    .Include(r => r.Motorcycle)
+                   
                     .Include(r=>r.Customer)
-                    .Where(r => r.IsActive != false&&(r.ProductId== ProductId || r.MotorcycleId== MotorcycleId))
+                    .Where(r => r.IsActive != false&&(r.ProductId== ProductId))
                     .ToListAsync();
-            
+                if (reviews.Count == 0)
+                {
+                    response.Success = false;
+                }
+                else { 
 
                 response.Success = true;
                 response.Message = "Reviews retrieved successfully.";
-                response.Data = reviews;
+                response.Data = reviews;}
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
+        }
+        public async Task<ServiceResponse> GetAllReviewForThisMoto( int MotorcycleId)
+        {
+            var response = new ServiceResponse();
+
+            try
+            {
+                var reviews = await _context.Reviews
+                    .Include(r => r.Motorcycle)
+                    .Include(r => r.Customer)
+                    .Where(r => r.IsActive != false && r.MotorcycleId == MotorcycleId)
+                    .ToListAsync();
+
+                if (reviews.Count == 0)
+                {
+                    response.Success = false;
+                }
+                else
+                {
+                    response.Success = true;
+                    response.Message = "Reviews retrieved successfully.";
+                    response.Data = reviews;
+                }
             }
             catch (Exception ex)
             {
@@ -282,7 +317,6 @@ response.Message = ex.Message;
                 if (review != null)
                 {
                     review.AdminNeedDeletedReview = dto.AdminNeedDeletedReview;
-                    review.AdminReason = dto.AdminReason;
                     if (dto.AdminNeedDeletedReview == true)
                     {
 
@@ -321,14 +355,13 @@ response.Message = ex.Message;
             try
             {
                 var review = await _context.Reviews
-        .Where(r => r.ReviewId == dto.ReviewId && r.StoreId == dto.StoreId && (r.MotorcycleId == dto.MotorcycleId || r.ProductId == dto.ProductId))// Assuming shopId maps to product/motorcycle
+        .Where(r => r.ReviewId == dto.ReviewId && r.StoreId == dto.StoreId && (r.MotorcycleId == dto.MotorcycleId || r.ProductId == dto.ProductId) && r.IsActive==false)// Assuming shopId maps to product/motorcycle
              .Select(r => new GetDeleteDto
              {
                  Rating = r.Rating,
                  ReviewId=r.ReviewId,
                  Comment=r.Comment,
                  StoreId = r.StoreId,
-                 AdminReason = r.AdminReason,
                  AdminNeedDeletedReview = r.AdminNeedDeletedReview,
                  CustomerId = r.CustomerId,
                  MotorcycleId = r.MotorcycleId,
@@ -356,6 +389,101 @@ response.Message = ex.Message;
                 }
 
 
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
+        }
+        public async Task<ServiceResponse> GetDeleteReviewbyAdmain()
+        {
+            var response = new ServiceResponse();
+            try
+            {   string? image=""; string? itemName = ""; string? storeName = "";
+                var reviews = await _context.Reviews
+                    .Where(r => r.IsActive != false  && r.StoreNeedDeletedReview==true&& r.AdminNeedDeletedReview!= true)
+                    .ToListAsync();
+
+                if (reviews == null || !reviews.Any())
+                {
+                    response.Success = false;
+                    response.Message = "No reviews found.";
+                    return response;
+                }
+                
+
+                var reviewDtos = new List<GetDeletebyAdmainReviewDto>();
+
+                foreach (var item in reviews)
+                {
+                    int? shopId = 0;
+
+                    if (item.ProductId != null)
+                    {
+                        var product = await _context.Products
+                            .FirstOrDefaultAsync(p => p.IsActive != false && p.ProductId == item.ProductId);
+
+                        if (product != null)
+                        {
+                            shopId = product.StoreId;
+                            var shop = await _context.Stores
+                            .FirstOrDefaultAsync(p => p.IsActive != false && p.StoreId == shopId);
+
+                         
+                            image = product.Images;
+                           itemName = product.Name;
+                            storeName = shop.StoreName;
+                        }
+                    }
+                    else
+                    {
+                        var motorcycle = await _context.Motorcycles
+                            .FirstOrDefaultAsync(m => m.IsActive != false && m.MotorcycleId == item.MotorcycleId);
+
+                        if (motorcycle != null)
+                        {
+                            shopId = motorcycle.StoreId;
+                            var shop = await _context.Stores
+                            .FirstOrDefaultAsync(p => p.IsActive != false && p.StoreId == shopId);
+
+
+                            image = motorcycle.Images;
+                            itemName = motorcycle.Name;
+                            storeName = shop.StoreName;
+
+                        }
+                    }
+                    var custom = await _context.Customers
+                            .FirstOrDefaultAsync(m => m.IsActive != false && m.CustomerId ==  item.CustomerId);
+
+                    reviewDtos.Add(new GetDeletebyAdmainReviewDto
+                    {
+                        Rating = item.Rating,
+                        ReviewId = item.ReviewId,
+                        Comment = item.Comment,
+                        StoreId = shopId,
+                        AdminNeedDeletedReview = item.AdminNeedDeletedReview,
+                        CustomerId = item.CustomerId,
+                        MotorcycleId = item.MotorcycleId,
+                        ProductId = item.ProductId,
+                        StoreNeedDeletedReview = item.StoreNeedDeletedReview,
+                        StoreReason = item.StoreReason,
+                        IsActive = item.IsActive,
+                        ItemImage=image,
+                        ItemName= itemName,
+                        StoreName= storeName,
+                        CreateAt = item.CreatedAt.ToString(),
+                        UserName = custom.Username
+
+                    });
+                }
+
+                response.Success = true;
+                response.Message = "Reviews retrieved successfully.";
+                response.Data = reviewDtos;
             }
             catch (Exception ex)
             {

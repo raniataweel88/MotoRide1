@@ -10,7 +10,7 @@ namespace MotoRide.Dto
         public string? Colors { get; set; }
         public IFormFile?Images { get; set; }
         public decimal Price { get; set; }
-        public int? SubCategoryId { get; set; }
+        public int? CategoryProductId { get; set; }
         public int? StoreId { get; set; }
         public int Quantity { get; set; }
 
@@ -24,9 +24,8 @@ namespace MotoRide.Dto
         public string? Colors { get; set; }
         public IFormFile? Images { get; set; }
         public decimal Price { get; set; }
-        public int? ShopOwnerId { get; set; }
-        public int? CategoryId { get; set; }
-        public int? SubCategoryId { get; set; }
+        public int? StoreId { get; set; }
+        public int? CategoryProductId { get; set; }
         public int Quantity { get; set; }
    
     }

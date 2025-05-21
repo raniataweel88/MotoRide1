@@ -10,14 +10,13 @@ namespace MotoRide.Models
         public DateTime? Date { get; set; }
         public float? Fee { get; set; }//الرسوم
         public string? CustomerNote { get; set; }
-        public bool? StatusDelivery { get; set; }
+       
+
         public DateTime? RecivingDate { get; set; }
         public int? CustomerId { get; set; }
-        public User? Customer { get; set; }
+        public Customer? Customer { get; set; }
         public int? StoreId { get; set; }
         public string? StatusPayment { get; set; }
-        public bool? StatusCompleteOrder { get; set; }
-        public string? DeliveryNote { get; set; }
         public int? PaymentmethodId { get; set; }
         public Paymentmethod? Paymentmethod { get; set; }
 

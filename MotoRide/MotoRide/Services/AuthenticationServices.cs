@@ -11,6 +11,7 @@ using System.Text;
 using static MotoRide.Helper.Enum;
 using Microsoft.AspNetCore.Http;
 using static System.Net.Mime.MediaTypeNames;
+using Newtonsoft.Json.Linq;
 
 namespace MotoRide.Services
 {
@@ -43,15 +44,14 @@ namespace MotoRide.Services
                     _respon.Message = $"Username are Exist";
                 }
                 else { 
-                User user = new User()
+                Customer user = new Customer()
                 {
                     Username = dto.Username,
                     Password = dto.Password,
                     Email = dto.Email,
                     Phone = dto.Phone,
-                    UserType = "Customer"
                 };
-                await _context.Users.AddAsync(user);
+                await _context.Customers.AddAsync(user);
                 await _context.SaveChangesAsync();
                 _respon.Success = true;
                 _respon.Message = "User Added Successfully";
@@ -64,7 +64,7 @@ namespace MotoRide.Services
             }
             return _respon;
         }
-        public async Task<ServiceResponse> AddUser(AddCustomerDto dto)
+        public async Task<ServiceResponse> AddUser(AddUserDto dto)
         {
             if (DoesUsernameAndPasswordExist(dto.Username))
             {
@@ -79,8 +79,7 @@ namespace MotoRide.Services
                     {
                         Username = dto.Username,
                         Password = dto.Password,
-
-                        UserType = dto.UserType
+                        UserType = dto.UserType,
                     };
                     await _context.Users.AddAsync(user);
                     await _context.SaveChangesAsync();
@@ -95,7 +94,6 @@ namespace MotoRide.Services
                 return _respon;
            
         }
-
         public async Task<ServiceResponse> RegisterOwnerShop(AddOwnerShopDto dto)
         {
             try
@@ -103,7 +101,7 @@ namespace MotoRide.Services
                 string? Iamgelicense = null;
 
                 // Check if a product image file is provided
-                if (Iamgelicense != null)
+                if (dto.Iamgelicense != null)
                 {
                     // Save the image and get its path
                     Iamgelicense = await _image.Imges(dto.Iamgelicense);
@@ -123,6 +121,7 @@ namespace MotoRide.Services
                         Email = dto.Email,
                         Phone = dto.Phone,
                         Location = dto.Location,
+                        CreatedAt=DateTime.UtcNow,
                         Iamgelicense = Iamgelicense,
                     };
                     await _context.Stores.AddAsync(store);
@@ -169,6 +168,13 @@ namespace MotoRide.Services
                     };
                     await _context.Maintenances.AddAsync(maintenance);
                     await _context.SaveChangesAsync();
+
+                    WorkHours workHours = new WorkHours();
+
+                    workHours.MaintanenceId = maintenance.Id;
+                    _context.WorkHours.Add(workHours);
+                    await _context.SaveChangesAsync();
+                    
                     _respon.Success = true;
                     _respon.Message = "Maintenance Added Successfully";
                 }
@@ -181,36 +187,21 @@ namespace MotoRide.Services
             return _respon;
         }
         public async Task<ServiceResponse> Login(LoginDto dto)
+
         {
-            var customer = await _context.Users.FirstOrDefaultAsync(x => x.Username == dto.Username && x.Password == dto.Password);
-            if (customer == null)
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == dto.Username && x.Password == dto.Password);
+            if (user == null)
             {
-             await LoginShop(dto);
-                return _respon;
+                await LoginCustomer(dto);
+          
             }
             else
             {
-                if (customer.UserType == "delivery")
-                {
-                    int deliveryId;
-                    string token = GenerateJwtToken(dto.Username, deliveryId = customer.UserId, "delivery");
-                    customer.Token = token;
-                    await _context.SaveChangesAsync();
-
-                    // Set the token in the session
-                    _httpContextAccessor.HttpContext.Session.SetString("JwtToken", token);
-
-                    _respon.Success = true;
-                    _respon.Message = "Oops! Your username or password is incorrect. Please try again.";
-                    _respon.Data = new { deliveryId, Token = token, Type = "delivery" };
-                    return _respon;
-                }
-
-                if (customer.UserType == "admin")
+                if (user.UserType == "admin")
                 {
                     int adminId;
-                    string token = GenerateJwtToken(dto.Username, adminId = customer.UserId, "admin");
-                    customer.Token = token;
+                    string token = GenerateJwtToken(dto.Username, adminId = user.UserId, "admin");
+                    user.Token = token;
                     await _context.SaveChangesAsync();
 
                     // Set the token in the session
@@ -220,23 +211,37 @@ namespace MotoRide.Services
                     _respon.Message = "Oops! Your username or password is incorrect. Please try again.";
                     _respon.Data = new { adminId, Token = token, Type = "admin" };
                     return _respon;
+
+
                 }
-                else { 
-                int CustomerId;
-                string token = GenerateJwtToken(dto.Username, CustomerId = customer.UserId, "Customer");
-                customer.Token = token;
-                await _context.SaveChangesAsync();
-                await _customerServices.AddPoints(CustomerId, 5);
-
-                // Set the token in the session
-                _httpContextAccessor.HttpContext.Session.SetString("JwtToken", token);
-
-                _respon.Success = true;
-                _respon.Message = "Oops! Your username or password is incorrect. Please try again.";
-                _respon.Data = new { CustomerId, Token = token, Type = "Customer" };
-                return _respon;
-            }}
+            }
+            return _respon;
         }
+        private async Task<ServiceResponse> LoginCustomer(LoginDto dto)
+        {
+            var user = _context.Customers.FirstOrDefault(x => x.Username == dto.Username && x.Password == dto.Password);
+            if (user == null)
+            {
+                await LoginShop(dto);
+                return _respon;
+            }
+            else
+            { 
+                
+                    string token = GenerateJwtToken(dto.Username, user.CustomerId, "Customer");
+                    user.Token = token;
+                    await _context.SaveChangesAsync();
+                    await _customerServices.AddPoints(user.CustomerId, 5);
+
+                    // Set the token in the session
+                    _httpContextAccessor.HttpContext.Session.SetString("JwtToken", token);
+
+                    _respon.Success = true;
+                    _respon.Message = "Oops! Your username or password is incorrect. Please try again.";
+                    _respon.Data = new { user.CustomerId, Token = token, Type = "Customer" };
+                    return _respon;
+                }
+            }
         private async Task<ServiceResponse> LoginMaintenance(LoginDto dto)
         {
             var maintenance = await _context.Maintenances.FirstOrDefaultAsync(x => x.MaintenanceName == dto.Username && x.Password == dto.Password);
@@ -309,7 +314,7 @@ namespace MotoRide.Services
         }
         public async Task<ServiceResponse> GetCustomerProfile(int id)
         {
-            var customer = await _context.Users.FirstOrDefaultAsync(x => x.UserId == id);
+            var customer = await _context.Customers.FirstOrDefaultAsync(x => x.CustomerId == id);
             if (customer != null)
             {
                 _respon.Success = true;
@@ -321,11 +326,37 @@ namespace MotoRide.Services
 
             return _respon;
         }
+        public async Task<ServiceResponse> LoginGoverment(LoginDto dto)
+
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == dto.Username && x.Password == dto.Password);
+            if (user == null)
+            {
+                _respon.Success = false;
+                _respon.Message = "Oops! Your username or password is incorrect. Please try again.";
+
+            }
+            else
+            {
+               
+                    string token = GenerateJwtToken(dto.Username,  user.UserId, "goverment");
+                    user.Token = token;
+                    await _context.SaveChangesAsync();
+
+                    // Set the token in the session
+                    _httpContextAccessor.HttpContext.Session.SetString("JwtToken", token);
+
+                    _respon.Success = true;
+                    _respon.Data = new { user.UserId, Token = token, Type = "admin" };
+
+            }
+            return _respon;
+        }
 
         public async Task<ServiceResponse> Logout(int id)
         {
             string? token;
-            var customer = _context.Users.FirstOrDefault(x => x.UserId == id);
+            var customer = _context.Customers.FirstOrDefault(x => x.CustomerId == id);
             if (customer == null)
             {
                 var shopOwner = _context.Stores.FirstOrDefault(x => x.StoreId == id);
@@ -364,6 +395,31 @@ namespace MotoRide.Services
             }
         }
 
+        public async Task<ServiceResponse> GetAllGovernment()
+        {
+            try
+            {
+                var shops = await _context.Users.Where(x => x.IsActive != false && x.UserType.Equals("government")).ToListAsync();
+
+                if (shops != null)
+                {
+                    _respon.Data = shops;
+                    _respon.Success = true;
+                }
+                else
+                {
+                    _respon.Message = "can not get any coverment";
+                    _respon.Success = false;
+                }
+                return _respon;
+            }
+            catch (Exception ex)
+            {
+                _respon.Message = ex.Message;
+                _respon.Success = false;
+                return _respon;
+            }
+        }
         private string GenerateJwtToken(string username, int userId, string role)
         {
             if (string.IsNullOrEmpty(username))
@@ -401,7 +457,7 @@ namespace MotoRide.Services
             try
             {
                 // Check if the email belongs to a Customer
-                var customer = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
+                var customer = await _context.Customers.FirstOrDefaultAsync(x => x.Email == email);
                 if (customer != null)
                 {
                     customer.Password = newPassword; // Update the password
@@ -438,12 +494,11 @@ namespace MotoRide.Services
         private bool DoesUsernameAndPasswordExist(string username)
         {
             bool existsInStore = _context.Stores.Any(x => x.StoreName == username);
-            bool existsInUsers = _context.Users.Any(x => x.Username == username);
+            bool existsInCustomers = _context.Customers.Any(x => x.Username == username);
             bool existsInMaintenance = _context.Maintenances.Any(x => x.MaintenanceName == username);
 
-            return existsInStore || existsInUsers || existsInMaintenance;
+            return existsInStore || existsInCustomers || existsInMaintenance;
         }
-
 
     }
 }

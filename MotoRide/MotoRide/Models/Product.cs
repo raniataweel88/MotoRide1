@@ -9,10 +9,8 @@
         public string? Colors { get; set; }
         public string? Images { get; set; }
         public decimal Price { get; set; }
-        public Category? Category { get; set; }
-        public int? CategoryId { get; set; }
-        public int? SubCategoryId { get; set; }
-       public SubCategory? SubCategory { get; set; }
+        public int? CategoryProductId { get; set; }
+       public CategoryProduct? SubCategory { get; set; }
         public List<Review>? Reviews { get; set; }
         public int Quantity { get; set; }
         public int? RemainingQuantity { get; set; }

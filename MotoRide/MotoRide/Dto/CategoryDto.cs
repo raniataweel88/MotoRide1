@@ -1,21 +1,21 @@
 ﻿namespace MotoRide.Dto
 {
-    public class CategoryDto
+    public class CategoryMaintenanceDto
     {
 
-        public int CategoryId { get; set; }
+        public int CategoryMaintenanceId { get; set; }
         public string? Name { get; set; }
     }
-    public class SubCategoryDto
+    public class CategoryProductDto
     {
         public string? Name { get; set; }
-        public int? ShopId { get; set; }
+        public int? StoreId { get; set; }
     }
-    public class UpdateSubCategoryDto
+    public class UpdateCategoryProductDto
     {
-        public int SubCategoryId { get; set; }
+        public int CategoryProductId { get; set; }
         public string? Name { get; set; }
-        public int? ShopId { get; set; }
+        public int? StoreId { get; set; }
     }
     
 }
