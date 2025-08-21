@@ -14,7 +14,7 @@ It provides an all-in-one experience including buying and selling motorcycles, s
 
 ---
 ## 🛠️ Tech Stack
-- **Frontend:** HTML, CSS, JavaScript, jQuery / Angular / React (based on chosen stack)  
-- **Backend:** ASP.NET Core 7 / MVC  
+- **Frontend:** HTML, CSS, JavaScript, jQuery ,ajax
+- **Backend:** ASP.NET Core 7 / API  
 - **Database:** SQL Server  
 - **Version Control:** Git & GitHub  
