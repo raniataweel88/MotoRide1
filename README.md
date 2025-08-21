@@ -17,4 +17,4 @@ It provides an all-in-one experience including buying and selling motorcycles, s
 - **Frontend:** HTML, CSS, JavaScript, jQuery ,ajax
 - **Backend:** ASP.NET Core 7 / API  
 - **Database:** SQL Server  
-- **Version Control:** Git & GitHub  
+
